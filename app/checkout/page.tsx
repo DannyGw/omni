@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCart } from "@/hooks/use-cart"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,6 +18,17 @@ export default function CheckoutPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Use useEffect to ensure we only access browser APIs after component mounts
+  useEffect(() => {
+    setIsClient(true)
+
+    // Check if cart is empty and redirect only on the client side
+    if (items.length === 0 && !isComplete) {
+      router.push("/cart")
+    }
+  }, [items.length, isComplete, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,9 +47,9 @@ export default function CheckoutPage() {
     }, 3000)
   }
 
-  if (items.length === 0 && !isComplete) {
-    router.push("/cart")
-    return null
+  // Show loading state until client-side code runs
+  if (!isClient) {
+    return <div className="container mx-auto px-4 py-16 text-center">Loading...</div>
   }
 
   if (isComplete) {
@@ -56,6 +67,12 @@ export default function CheckoutPage() {
         </div>
       </div>
     )
+  }
+
+  // If we're on the client and the cart is empty, the useEffect will handle redirection
+  // This prevents hydration errors
+  if (items.length === 0) {
+    return <div className="container mx-auto px-4 py-16 text-center">Redirecting to cart...</div>
   }
 
   return (
@@ -149,7 +166,7 @@ export default function CheckoutPage() {
 
             <div className="mt-8">
               <Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto">
-                {isSubmitting ? "Processing..." : `Pay $${cartTotal.toFixed(2)}`}
+                {isSubmitting ? "Processing..." : `Pay ${cartTotal.toFixed(2)}`}
               </Button>
             </div>
           </form>

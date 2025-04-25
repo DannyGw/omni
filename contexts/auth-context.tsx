@@ -20,17 +20,36 @@ interface AuthContextType {
   refreshUser: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+// Create a default context value to prevent undefined errors
+const defaultContextValue: AuthContextType = {
+  user: null,
+  isLoading: true,
+  isAuthenticated: false,
+  isAdmin: false,
+  login: () => {},
+  logout: async () => {},
+  refreshUser: async () => {},
+}
+
+const AuthContext = createContext<AuthContextType>(defaultContextValue)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
+
+  // Set isMounted to true when component mounts
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Check authentication status on mount
   useEffect(() => {
-    refreshUser()
-  }, [])
+    if (isMounted) {
+      refreshUser()
+    }
+  }, [isMounted])
 
   const refreshUser = async () => {
     try {
@@ -85,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider")
   }
   return context

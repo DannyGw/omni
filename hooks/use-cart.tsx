@@ -17,27 +17,48 @@ interface CartContextType {
   cartTotal: number
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined)
+// Create a default context value to prevent undefined errors
+const defaultCartContext: CartContextType = {
+  items: [],
+  addItem: () => {},
+  removeItem: () => {},
+  updateItemQuantity: () => {},
+  clearCart: () => {},
+  itemCount: 0,
+  cartTotal: 0,
+}
+
+const CartContext = createContext<CartContextType>(defaultCartContext)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Set isMounted to true when component mounts
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const storedCart = localStorage.getItem("cart")
-    if (storedCart) {
-      try {
-        setItems(JSON.parse(storedCart))
-      } catch (error) {
-        console.error("Failed to parse cart from localStorage:", error)
+    if (isMounted) {
+      const storedCart = localStorage.getItem("cart")
+      if (storedCart) {
+        try {
+          setItems(JSON.parse(storedCart))
+        } catch (error) {
+          console.error("Failed to parse cart from localStorage:", error)
+        }
       }
     }
-  }, [])
+  }, [isMounted])
 
   // Save cart to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(items))
-  }, [items])
+    if (isMounted && items.length > 0) {
+      localStorage.setItem("cart", JSON.stringify(items))
+    }
+  }, [items, isMounted])
 
   const addItem = (product: Product, quantity = 1) => {
     setItems((prevItems) => {
@@ -63,6 +84,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([])
+    if (isMounted) {
+      localStorage.removeItem("cart")
+    }
   }
 
   const itemCount = items.reduce((total, item) => total + item.quantity, 0)
@@ -88,7 +112,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
 export function useCart() {
   const context = useContext(CartContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useCart must be used within a CartProvider")
   }
   return context

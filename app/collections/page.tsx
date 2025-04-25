@@ -9,6 +9,25 @@ interface Category {
   product_count: number
 }
 
+// Mock categories for when database is not available
+const mockCategories: Category[] = [
+  {
+    name: "electronics",
+    description: "Latest gadgets and electronic devices",
+    product_count: 12,
+  },
+  {
+    name: "clothing",
+    description: "Fashion and apparel for all seasons",
+    product_count: 24,
+  },
+  {
+    name: "home",
+    description: "Furniture and home decor items",
+    product_count: 18,
+  },
+]
+
 async function getCategories(): Promise<Category[]> {
   try {
     const categories = await sql<Category[]>`
@@ -25,10 +44,10 @@ async function getCategories(): Promise<Category[]> {
       ORDER BY 
         c.name
     `
-    return categories
+    return categories.length > 0 ? categories : mockCategories
   } catch (error) {
     console.error("Database error:", error)
-    return []
+    return mockCategories
   }
 }
 

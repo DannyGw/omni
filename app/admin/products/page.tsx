@@ -28,31 +28,37 @@ export default async function AdminProductsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {products.map(async (product) => {
-              const inventory = await getProductInventory(product.id)
-              return (
-                <tr key={product.id}>
-                  <td className="px-4 py-3">{product.id}</td>
-                  <td className="px-4 py-3">{product.name}</td>
-                  <td className="px-4 py-3">{product.category}</td>
-                  <td className="px-4 py-3">${product.price.toFixed(2)}</td>
-                  <td className="px-4 py-3">{inventory}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/products/${product.id}/edit`}>Edit</Link>
-                      </Button>
-                      <Button variant="destructive" size="sm">
-                        Delete
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
+            {products.map((product) => (
+              <ProductRow key={product.id} product={product} />
+            ))}
           </tbody>
         </table>
       </div>
     </div>
+  )
+}
+
+// Separate component to handle async inventory fetching
+async function ProductRow({ product }: { product: any }) {
+  const inventory = await getProductInventory(product.id)
+
+  return (
+    <tr>
+      <td className="px-4 py-3">{product.id}</td>
+      <td className="px-4 py-3">{product.name}</td>
+      <td className="px-4 py-3">{product.category}</td>
+      <td className="px-4 py-3">${product.price.toFixed(2)}</td>
+      <td className="px-4 py-3">{inventory}</td>
+      <td className="px-4 py-3">
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/admin/products/${product.id}/edit`}>Edit</Link>
+          </Button>
+          <Button variant="destructive" size="sm">
+            Delete
+          </Button>
+        </div>
+      </td>
+    </tr>
   )
 }

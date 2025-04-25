@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/contexts/auth-context"
+import { ErrorBoundary } from "@/components/error-boundary"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,39 +25,38 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
+        <ErrorBoundary>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <CartProvider>
-              <div className="relative min-h-screen flex flex-col">
-                <Navbar />
-                <div className="flex-1">{children}</div>
-                <footer className="border-t py-6 md:py-8">
-                  <div className="container flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
-                    <p className="text-sm text-muted-foreground">
-                      © {new Date().getFullYear()} E-commerce Store. All rights reserved.
-                    </p>
-                    <div className="flex gap-4 text-sm text-muted-foreground">
-                      <a href="#" className="hover:underline">
-                        Terms
-                      </a>
-                      <a href="#" className="hover:underline">
-                        Privacy
-                      </a>
-                      <a href="#" className="hover:underline">
-                        Contact
-                      </a>
+            <AuthProvider>
+              <CartProvider>
+                <div className="relative min-h-screen flex flex-col">
+                  <Navbar />
+                  <div className="flex-1">{children}</div>
+                  <footer className="border-t py-6 md:py-8">
+                    <div className="container flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+                      <p className="text-sm text-muted-foreground">
+                        © {new Date().getFullYear()} E-commerce Store. All rights reserved.
+                      </p>
+                      <div className="flex gap-4 text-sm text-muted-foreground">
+                        <a href="#" className="hover:underline">
+                          Terms
+                        </a>
+                        <a href="#" className="hover:underline">
+                          Privacy
+                        </a>
+                        <a href="#" className="hover:underline">
+                          Contact
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                </footer>
-              </div>
-              <Toaster />
-            </CartProvider>
+                  </footer>
+                </div>
+                <Toaster />
+              </CartProvider>
+            </AuthProvider>
           </ThemeProvider>
-        </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
 }
-
-
-import './globals.css'

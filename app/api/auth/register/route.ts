@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const { name, email, password } = body
 
     if (!name || !email || !password) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 })
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
     // Check if user already exists
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     `
 
     if (existingUsers.length > 0) {
-      return NextResponse.json({ message: "User with this email already exists" }, { status: 409 })
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 })
     }
 
     // Hash password
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     `
 
     if (newUsers.length === 0) {
-      return NextResponse.json({ message: "Failed to create user" }, { status: 500 })
+      return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
     }
 
     const user = newUsers[0]
@@ -53,6 +53,12 @@ export async function POST(request: Request) {
     )
   } catch (error) {
     console.error("Registration error:", error)
-    return NextResponse.json({ message: "An unexpected error occurred" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Registration failed",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }

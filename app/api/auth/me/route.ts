@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const session = await getUserFromSession(request)
 
     if (!session) {
-      return NextResponse.json({ user: null }, { status: 401 })
+      return NextResponse.json({ user: null }, { status: 200 })
     }
 
     // Get user details from database
@@ -20,12 +20,18 @@ export async function GET(request: Request) {
 
     if (users.length === 0) {
       clearAuthCookie()
-      return NextResponse.json({ user: null }, { status: 401 })
+      return NextResponse.json({ user: null }, { status: 200 })
     }
 
     return NextResponse.json({ user: users[0] })
   } catch (error) {
     console.error("Error fetching user:", error)
-    return NextResponse.json({ message: "An unexpected error occurred" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to fetch user",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }

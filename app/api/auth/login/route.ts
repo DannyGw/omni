@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const { email, password } = body
 
     if (!email || !password) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 })
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
     // Get user from database
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     `
 
     if (users.length === 0) {
-      return NextResponse.json({ message: "Invalid credentials" }, { status: 401 })
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
     const user = users[0]
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const isPasswordValid = await verifyPassword(password, user.password)
 
     if (!isPasswordValid) {
-      return NextResponse.json({ message: "Invalid credentials" }, { status: 401 })
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
     // Set auth cookie
@@ -45,6 +45,12 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error("Login error:", error)
-    return NextResponse.json({ message: "An unexpected error occurred" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Login failed",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import ProductCard from "@/components/product-card"
 import type { Product } from "@/lib/types"
-import { getProducts } from "@/lib/products"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -11,17 +10,35 @@ export default function ProductGrid() {
   const [products, setProducts] = useState<Product[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("default")
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await getProducts()
-        setProducts(data)
-        setFilteredProducts(data)
+        const response = await fetch("/api/products")
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const contentType = response.headers.get("content-type")
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Response is not JSON")
+        }
+
+        const data = await response.json()
+
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        setProducts(data.products || [])
+        setFilteredProducts(data.products || [])
       } catch (error) {
         console.error("Error fetching products:", error)
+        setError(error instanceof Error ? error.message : "Failed to load products")
       } finally {
         setLoading(false)
       }
@@ -60,6 +77,21 @@ export default function ProductGrid() {
         {[...Array(8)].map((_, i) => (
           <div key={i} className="bg-gray-100 rounded-lg p-4 h-80 animate-pulse" />
         ))}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h3 className="text-xl font-medium text-red-600 mb-2">Error loading products</h3>
+        <p className="text-muted-foreground">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Try Again
+        </button>
       </div>
     )
   }

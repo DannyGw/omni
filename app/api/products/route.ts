@@ -9,7 +9,8 @@ export async function GET() {
     console.error("Error fetching products:", error)
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to fetch products",
+        error: "Failed to fetch products",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
     )
@@ -39,7 +40,8 @@ export async function POST(request: Request) {
     console.error("Error creating product:", error)
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to create product",
+        error: "Failed to create product",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
     )

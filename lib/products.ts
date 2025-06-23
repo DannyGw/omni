@@ -1,5 +1,6 @@
 import { sql } from "./db"
 import type { Product } from "./types"
+import { schemaReady } from "./db" // ensure tables exist before querying
 
 // Mock data for when database is not available
 const mockProducts: Product[] = [
@@ -23,6 +24,7 @@ const mockProducts: Product[] = [
 
 // Get all products
 export async function getProducts(): Promise<Product[]> {
+  await schemaReady
   try {
     const products = await sql<Product[]>`
       SELECT p.id::text, p.name, p.description, p.price::float, p.image, p.category
@@ -31,10 +33,10 @@ export async function getProducts(): Promise<Product[]> {
       WHERE i.quantity > 0
       ORDER BY p.created_at DESC
     `
-    return products.length > 0 ? products : mockProducts
+    return products
   } catch (error) {
     console.error("Database error:", error)
-    return mockProducts
+    return []
   }
 }
 

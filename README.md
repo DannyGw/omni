@@ -1,4 +1,4 @@
-# Next Commerce
+# Omni - Digital Nomad Portfolio Project (2026 Refresh)
 
 A modern e-commerce platform built with Next.js, TypeScript, and Tailwind CSS.
 

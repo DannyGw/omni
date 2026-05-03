@@ -2,7 +2,7 @@
 
 ## Framework & Routing
 
-- Use **Next.js 14 App Router** patterns for all routing and file structure.
+- Use **Next.js 16 App Router** patterns for all routing and file structure.
 
 ## Components
 

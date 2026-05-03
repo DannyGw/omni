@@ -39,8 +39,8 @@ A modern e-commerce platform built with Next.js, TypeScript, and Tailwind CSS.
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/next-commerce.git
-    cd next-commerce
+    git clone https://github.com/DannyGw/omni.git
+    cd OMNI
     ```
 
 2. Install dependencies:

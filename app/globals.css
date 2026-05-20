@@ -17,6 +17,10 @@ body {
   :root {
     --font-heading: 'Playfair Display', serif;
     --font-body: 'Montserrat', sans-serif;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 3rem;
+    letter-spacing: -0.02em;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
